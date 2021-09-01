@@ -4,7 +4,7 @@ use pyo3::exceptions::PyValueError;
 use crate::parameters::Parameters;
 
 #[pyclass]
-#[derive(FromPyObject)]
+#[derive(Clone)]
 pub struct Participant {
     pub participant: frost_dalek::keygen::Participant,
     pub coefficients: frost_dalek::keygen::Coefficients,

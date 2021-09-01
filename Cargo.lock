@@ -75,6 +75,7 @@ dependencies = [
 name = "frost-python"
 version = "0.1.0"
 dependencies = [
+ "curve25519-dalek",
  "frost-dalek",
  "pyo3",
 ]
