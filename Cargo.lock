@@ -78,6 +78,7 @@ dependencies = [
  "curve25519-dalek",
  "frost-dalek",
  "pyo3",
+ "rand",
 ]
 
 [[package]]

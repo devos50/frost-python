@@ -10,6 +10,7 @@ crate-type = ["cdylib"]
 [dependencies]
 frost-dalek = {version = "0.2.3" }
 curve25519-dalek = { version = "3" }
+rand = { version = "0.7" }
 
 [patch.crates-io]
 frost-dalek = { path = "../frost-dalek" }
