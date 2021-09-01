@@ -1,0 +1,18 @@
+[package]
+name = "frost-python"
+version = "0.1.0"
+edition = "2018"
+
+[lib]
+name = "frost"
+crate-type = ["cdylib"]
+
+[dependencies]
+frost-dalek = {version = "0.2.3" }
+
+[patch.crates-io]
+frost-dalek = { path = "../frost-dalek" }
+
+[dependencies.pyo3]
+version = "0.14.4"
+features = ["extension-module"]
