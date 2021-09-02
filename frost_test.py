@@ -1,3 +1,5 @@
+from binascii import hexlify
+
 import frost
 
 params = frost.Parameters(3, 2)
@@ -36,6 +38,8 @@ carol_group_key, carol_secret_key, carol_public_key = carol_state.finish(carol)
 assert alice_group_key[0] == bob_group_key[0], "Group keys should match!"
 assert bob_group_key[0] == carol_group_key[0], "Group keys should match!"
 
+print("Done generating distributed key, group key: %s" % hexlify(bytes(alice_group_key)).decode())
+
 # ------- END KEY GEN ------- #
 
 alice_public_comshares, alice_secret_comshares = frost.generate_commitment_share_lists(1, 1)
@@ -57,12 +61,20 @@ signers = aggregator.get_signers()
 alice_partial = frost.sign(1, alice_secret_key, msg_hash, alice_group_key, alice_secret_comshares, 0, signers)
 carol_partial = frost.sign(3, carol_secret_key, msg_hash, carol_group_key, carol_secret_comshares, 0, signers)
 
+alice_partial_hex = hexlify(bytes(alice_partial[1]))
+carol_partial_hex = hexlify(bytes(carol_partial[1]))
+print("Partial signature of Alice: %s" % alice_partial_hex.decode())
+print("Partial signature of Carol: %s" % carol_partial_hex.decode())
+
 aggregator.include_partial_signature(alice_partial)
 aggregator.include_partial_signature(carol_partial)
 
 aggregator = aggregator.finalize()
 
 threshold_sig = aggregator.aggregate()
+threshold_sig_hex = hexlify(bytes(threshold_sig[0] + threshold_sig[1]))
+print("Resulting threshold Schnorr signature: %s" % threshold_sig_hex.decode())
+
 if frost.verify(threshold_sig, alice_group_key, msg_hash) == 0:
     print("Signature invalid!")
 else:
