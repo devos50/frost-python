@@ -37,3 +37,33 @@ assert alice_group_key[0] == bob_group_key[0], "Group keys should match!"
 assert bob_group_key[0] == carol_group_key[0], "Group keys should match!"
 
 # ------- END KEY GEN ------- #
+
+alice_public_comshares, alice_secret_comshares = frost.generate_commitment_share_lists(1, 1)
+bob_public_comshares, bob_secret_comshares = frost.generate_commitment_share_lists(2, 1)
+carol_public_comshares, carol_secret_comshares = frost.generate_commitment_share_lists(3, 1)
+
+context = b"CONTEXT STRING STOLEN FROM DALEK TEST SUITE"
+message = b"This is a test of the tsunami alert system. This is only a test."
+
+msg_hash = bytes(frost.compute_message_hash(context, message))
+
+# Signature aggregation
+aggregator = frost.SignatureAggregatorInitial(params, bob_group_key, context, message)
+aggregator.include_signer(1, alice_public_comshares[0], alice_public_key)
+aggregator.include_signer(3, carol_public_comshares[0], carol_public_key)
+
+signers = aggregator.get_signers()
+
+alice_partial = frost.sign(1, alice_secret_key, msg_hash, alice_group_key, alice_secret_comshares, 0, signers)
+carol_partial = frost.sign(3, carol_secret_key, msg_hash, carol_group_key, carol_secret_comshares, 0, signers)
+
+aggregator.include_partial_signature(alice_partial)
+aggregator.include_partial_signature(carol_partial)
+
+aggregator = aggregator.finalize()
+
+threshold_sig = aggregator.aggregate()
+if frost.verify(threshold_sig, alice_group_key, msg_hash) == 0:
+    print("Signature invalid!")
+else:
+    print("Signature valid :)")
